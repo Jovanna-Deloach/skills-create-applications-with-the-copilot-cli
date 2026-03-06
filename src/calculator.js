@@ -1,13 +1,17 @@
 /**
  * calculator.js
- * A simple Node.js CLI calculator supporting four basic arithmetic operations:
+ * A simple Node.js CLI calculator supporting arithmetic operations:
  *   - Addition (+)
  *   - Subtraction (-)
  *   - Multiplication (x)
  *   - Division (÷)
+ *   - Modulo (%)
+ *   - Exponentiation (**)
+ *   - Square Root (√)
  *
- * Usage: node src/calculator.js <operation> <num1> <num2>
+ * Usage: node src/calculator.js <operation> <num1> [num2]
  * Example: node src/calculator.js add 5 3
+ *          node src/calculator.js squareRoot 25
  */
 
 /**
@@ -40,7 +44,30 @@ function divide(a, b) {
   return a / b;
 }
 
-module.exports = { add, subtract, multiply, divide };
+/**
+ * Modulo: returns the remainder of a divided by b.
+ */
+function modulo(a, b) {
+  return a % b;
+}
+
+/**
+ * Power: returns base raised to the given exponent.
+ */
+function power(base, exponent) {
+  return base ** exponent;
+}
+
+/**
+ * Square Root: returns the square root of n.
+ * Throws an error if n is negative.
+ */
+function squareRoot(n) {
+  if (n < 0) throw new Error('Square root of a negative number is not allowed');
+  return Math.sqrt(n);
+}
+
+module.exports = { add, subtract, multiply, divide, modulo, power, squareRoot };
 
 // CLI entry point
 if (require.main === module) {
@@ -48,20 +75,26 @@ if (require.main === module) {
   const a = parseFloat(num1);
   const b = parseFloat(num2);
 
-  if (!operation || isNaN(a) || isNaN(b)) {
-    console.error('Usage: node src/calculator.js <add|subtract|multiply|divide> <num1> <num2>');
+  const singleOperandOps = ['squareRoot'];
+  const isSingleOperand = singleOperandOps.includes(operation);
+
+  if (!operation || isNaN(a) || (!isSingleOperand && isNaN(b))) {
+    console.error('Usage: node src/calculator.js <add|subtract|multiply|divide|modulo|power|squareRoot> <num1> [num2]');
     process.exit(1);
   }
 
   try {
     let result;
     switch (operation) {
-      case 'add':      result = add(a, b);      break;
-      case 'subtract': result = subtract(a, b); break;
-      case 'multiply': result = multiply(a, b); break;
-      case 'divide':   result = divide(a, b);   break;
+      case 'add':        result = add(a, b);        break;
+      case 'subtract':   result = subtract(a, b);   break;
+      case 'multiply':   result = multiply(a, b);   break;
+      case 'divide':     result = divide(a, b);     break;
+      case 'modulo':     result = modulo(a, b);     break;
+      case 'power':      result = power(a, b);      break;
+      case 'squareRoot': result = squareRoot(a);    break;
       default:
-        console.error(`Unknown operation: "${operation}". Use add, subtract, multiply, or divide.`);
+        console.error(`Unknown operation: "${operation}". Use add, subtract, multiply, divide, modulo, power, or squareRoot.`);
         process.exit(1);
     }
     console.log(`Result: ${result}`);
